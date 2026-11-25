@@ -19,10 +19,13 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 def main():
     out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
     os.makedirs(out_dir, exist_ok=True)
-    shutil.copyfile(
-        os.path.join(_HERE, "entry.png"),
-        os.path.join(out_dir, "entry.png"),
-    )
+    src = os.path.join(_HERE, "entry.png")
+    dst = os.path.join(out_dir, "entry.png")
+    shutil.copyfile(src, dst)
+    # The gate requires both runs to write the same bytes: fail loudly
+    # instead of leaving a partial or mismatched copy behind.
+    if os.path.getsize(dst) != os.path.getsize(src):
+        raise SystemExit("entry.png copy size mismatch")
 
 
 if __name__ == "__main__":
